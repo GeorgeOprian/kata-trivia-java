@@ -1,8 +1,8 @@
 
 package trivia;
 
-import org.junit.Ignore;
 import org.junit.Test;
+import trivia.gamebetter.GameBetter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -30,9 +30,9 @@ public class GameTest {
 			expectedOutput, actualOutput);
 	}
 	@Test
-	@Ignore("enable back and set a particular seed to see the output")
+//	@Ignore("enable back and set a particular seed to see the output")
 	public void oneSeed() {
-		testSeed(1, true);
+		testSeed(3, true);
 	}
 
 	private String extractOutput(Random rand, IGame aGame) {
