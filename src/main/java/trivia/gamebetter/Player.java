@@ -3,13 +3,13 @@ package trivia.gamebetter;
 public class Player {
     private final String name;
     private int currentLocation;
-    private int purse;
+    private int goldCoins;
     private boolean inPenaltyBox;
 
     public Player(String name) {
         this.name = name;
         this.currentLocation = 0;
-        this.purse = 0;
+        this.goldCoins = 0;
         this.inPenaltyBox = false;
     }
 
@@ -25,16 +25,16 @@ public class Player {
         this.currentLocation = currentLocation;
     }
 
-    public int getPurse() {
-        return purse;
+    public int getGoldCoins() {
+        return goldCoins;
     }
 
     public void incrementPurse() {
-        purse++;
+        goldCoins++;
     }
 
-    public void setPurse(int purse) {
-        this.purse = purse;
+    public void setGoldCoins(int goldCoins) {
+        this.goldCoins = goldCoins;
     }
 
     public boolean isInPenaltyBox() {

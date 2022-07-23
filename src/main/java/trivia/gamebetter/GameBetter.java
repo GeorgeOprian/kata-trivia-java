@@ -156,7 +156,7 @@ public class GameBetter implements IGame {
 
         currentPlayer.incrementPurse();
 
-        System.out.println(currentPlayer + " now has " + currentPlayer.getPurse() + " Gold Coins.");
+        System.out.println(currentPlayer + " now has " + currentPlayer.getGoldCoins() + " Gold Coins.");
     }
 
     private void switchToNextPlayer() {
@@ -174,6 +174,6 @@ public class GameBetter implements IGame {
     }
 
     private boolean didPlayerNotWin() {
-        return players.get(currentPlayerIndex).getPurse() != 6; //posibil bug poate trebuia sa fie > 6
+        return players.get(currentPlayerIndex).getGoldCoins() != 6; //posibil bug poate trebuia sa fie > 6
     }
 }
