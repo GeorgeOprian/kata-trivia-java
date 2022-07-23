@@ -1,6 +1,5 @@
 package trivia.cr;
 
-import trivia.IGame;
 import trivia.cr.exception.GameStartedException;
 
 import java.util.ArrayList;
@@ -14,6 +13,7 @@ public class Game implements IGame {
     int[] purses = new int[6];
     boolean[] inPenaltyBox = new boolean[6];
     int[] incorrectlyAnsweredQuestionsInARow = new int[6];
+    int[] correctlyAnsweredQuestionsInARow = new int[6];
 
     LinkedList popQuestions = new LinkedList();
     LinkedList scienceQuestions = new LinkedList();
@@ -27,7 +27,7 @@ public class Game implements IGame {
     private boolean gameStarted;
 
     public Game() {
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 100; i++) {
             popQuestions.addLast("Pop Question " + i);
             scienceQuestions.addLast(("Science Question " + i));
             sportsQuestions.addLast(("Sports Question " + i));
@@ -132,10 +132,17 @@ public class Game implements IGame {
     }
 
     public boolean wasCorrectlyAnswered() {
+        correctlyAnsweredQuestionsInARow[currentPlayer] ++;
         if (inPenaltyBox[currentPlayer]) {
             if (isGettingOutOfPenaltyBox) {
                 System.out.println("Answer was correct!!!!");
-                purses[currentPlayer]++;
+
+                if (playerIsOnAStreak()) {
+                    purses[currentPlayer] += GameBetter.NUMBER_OF_COINS_AWARDED_ON_STREAK;
+                } else {
+                    purses[currentPlayer]++;
+                }
+
                 System.out.println(players.get(currentPlayer)
                         + " now has "
                         + purses[currentPlayer]
@@ -152,12 +159,15 @@ public class Game implements IGame {
                 return true;
             }
 
-
         } else {
 
 //         System.out.println("Answer was corrent!!!!"); //Typooo
             System.out.println("Answer was correct!!!!");
-            purses[currentPlayer]++;
+            if (playerIsOnAStreak()) {
+                purses[currentPlayer] += GameBetter.NUMBER_OF_COINS_AWARDED_ON_STREAK;
+            } else {
+                purses[currentPlayer]++;
+            }
             System.out.println(players.get(currentPlayer)
                     + " now has "
                     + purses[currentPlayer]
@@ -172,12 +182,17 @@ public class Game implements IGame {
     }
 
     public boolean wrongAnswer() {
+        System.out.println("Question was incorrectly answered");
+
+        if (playerIsOnAStreak()) {
+            correctlyAnsweredQuestionsInARow[currentPlayer] = 0;
+        }
+
         if (incorrectlyAnsweredQuestionsInARow[currentPlayer] == 0) {
             incorrectlyAnsweredQuestionsInARow[currentPlayer]++;
             return true;
         }
 
-        System.out.println("Question was incorrectly answered");
         System.out.println(players.get(currentPlayer) + " was sent to the penalty box");
         inPenaltyBox[currentPlayer] = true;
         incorrectlyAnsweredQuestionsInARow[currentPlayer] = 0;
@@ -187,8 +202,17 @@ public class Game implements IGame {
         return true;
     }
 
+    private boolean playerIsOnAStreak() {
+        return correctlyAnsweredQuestionsInARow[currentPlayer] >= GameBetter.REQUIRED_QUESTIONS_FOR_STREAK;
+    }
+
+    @Override
+    public Player getCurrentPlayer() {
+        return new Player(players.get(currentPlayer).toString());
+    }
+
 
     private boolean didPlayerWin() {
-        return !(purses[currentPlayer] == 6);
+        return !(purses[currentPlayer] == 12);
     }
 }

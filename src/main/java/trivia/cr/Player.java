@@ -5,6 +5,7 @@ import java.util.Objects;
 public class Player {
     private final String name;
     private int currentLocation;
+    private int correctlyAnsweredQuestionsInARow;
     private int incorrectlyAnsweredQuestionsInARow;
     private int goldCoins;
     private boolean inPenaltyBox;
@@ -32,8 +33,8 @@ public class Player {
         return goldCoins;
     }
 
-    public void incrementPurse() {
-        goldCoins++;
+    public void addNumberOfCoins(int numberOfCoins) {
+        goldCoins += numberOfCoins;
     }
 
     public void setGoldCoins(int goldCoins) {
@@ -52,6 +53,22 @@ public class Player {
         currentLocation += numberOfPlaces;
     }
 
+    public int getCorrectlyAnsweredQuestionsInARow() {
+        return correctlyAnsweredQuestionsInARow;
+    }
+
+    public void setCorrectlyAnsweredQuestionsInARow(int correctlyAnsweredQuestionsInARow) {
+        this.correctlyAnsweredQuestionsInARow = correctlyAnsweredQuestionsInARow;
+    }
+
+    public void incrementCorrectlyAnsweredQuestionsInARow() {
+        correctlyAnsweredQuestionsInARow++;
+    }
+
+    public void resetCorrectlyAnsweredQuestionsInARow() {
+        correctlyAnsweredQuestionsInARow = 0;
+    }
+
     public int getIncorrectlyAnsweredQuestionsInARow() {
         return incorrectlyAnsweredQuestionsInARow;
     }
@@ -60,7 +77,7 @@ public class Player {
         this.incorrectlyAnsweredQuestionsInARow = incorrectlyAnsweredQuestionsInARow;
     }
 
-    public void incrementNumberOfQuestionsIncorrectlyAnsweredInARow() {
+    public void incrementIncorrectlyAnsweredQuestionsInARow() {
         incorrectlyAnsweredQuestionsInARow++;
     }
 

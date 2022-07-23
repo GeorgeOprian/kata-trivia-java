@@ -163,4 +163,5 @@ public class GameBetter implements IGame {
     private boolean didPlayerNotWin() {
         return players.get(currentPlayerIndex).getGoldCoins() != 6; //posibil bug poate trebuia sa fie > 6
     }
+
 }

@@ -37,7 +37,7 @@ public class GameCRTest {
         testSeed(3, true);
     }
 
-    private String extractOutput(Random rand, IGame aGame) {
+    private String extractOutput(Random rand, trivia.cr.IGame aGame) {
         PrintStream old = System.out;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (PrintStream inmemory = new PrintStream(baos)) {

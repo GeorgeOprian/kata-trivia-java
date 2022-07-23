@@ -1,6 +1,4 @@
-package trivia;
-
-import trivia.cr.Player;
+package trivia.cr;
 
 public interface IGame {
 
@@ -11,5 +9,7 @@ public interface IGame {
 	boolean wasCorrectlyAnswered();
 
 	boolean wrongAnswer();
+
+	Player getCurrentPlayer();
 
 }

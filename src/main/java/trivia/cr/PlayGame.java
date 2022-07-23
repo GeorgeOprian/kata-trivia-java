@@ -1,7 +1,7 @@
 package trivia.cr;
 
-import trivia.Game;
-import trivia.IGame;
+
+import trivia.cr.IGame;
 
 import java.util.Random;
 import java.util.Scanner;
@@ -30,12 +30,14 @@ public class PlayGame {
 
       System.out.println("\n\n--Starting game--");
 
-
       boolean notAWinner;
+      Player previousPlayer = null;
       do {
-         aGame.add("Costel");
-         int roll = readRoll();
-         aGame.roll(roll);
+         Player currentPlayer = aGame.getCurrentPlayer();
+         if (currentPlayer != null && !currentPlayer.equals(previousPlayer)) {
+            int roll = readRoll();
+            aGame.roll(roll);
+         }
 
          System.out.print(">> Was the answer correct? [y/n] ");
          boolean correct = readYesNo();
@@ -45,6 +47,9 @@ public class PlayGame {
             notAWinner = aGame.wrongAnswer();
          }
 
+         previousPlayer = currentPlayer;
+
+         System.out.println();
       } while (notAWinner);
       System.out.println(">> Game won!");
    }

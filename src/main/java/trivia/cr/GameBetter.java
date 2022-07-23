@@ -1,6 +1,6 @@
 package trivia.cr;
 
-import trivia.IGame;
+import trivia.cr.IGame;
 import trivia.cr.exception.IncorrectNumberOfPlayersException;
 import trivia.cr.exception.UnableToLoadQuestionsException;
 import trivia.cr.question.DuplicatePlayerNameException;
@@ -15,12 +15,18 @@ public class GameBetter implements IGame {
 
     public static final int MIN_NUMBER_OF_PLAYERS = 2;
     public static final int MAX_NUMBER_OF_PLAYERS = 6;
+
+    private static final int NUMBER_OF_COINS_AWARDED = 1;
+    public static final int NUMBER_OF_COINS_AWARDED_ON_STREAK = 2;
+    public static final int REQUIRED_QUESTIONS_FOR_STREAK = 3;
+    public static final int REQUIRED_COINS_FOR_WINNING = 12;
+
+    private static final int PLACES_ON_BOARD_PER_CATEGORY = 3;
+
     private static int BOARD_SIZE;
     private final QuestionsHandler questionsHandler;
 
     private final List<Player> players = new ArrayList<>();
-
-    private final int PLACES_ON_BOARD_PER_CATEGORY;
 
     private int currentPlayerIndex = 0;
     private boolean isGettingOutOfPenaltyBox;
@@ -39,8 +45,6 @@ public class GameBetter implements IGame {
         } catch (IOException e) {
             throw new UnableToLoadQuestionsException();
         }
-
-        PLACES_ON_BOARD_PER_CATEGORY = 3;
         BOARD_SIZE = questionsHandler.getNumberOfCategories() * PLACES_ON_BOARD_PER_CATEGORY;
     }
 
@@ -67,7 +71,7 @@ public class GameBetter implements IGame {
     }
 
     public void roll(int roll) {
-        Player currentPlayer = players.get(currentPlayerIndex);
+        Player currentPlayer = getCurrentPlayer();
         System.out.println(currentPlayer + " is the current player");
         System.out.println("They have rolled a " + roll);
 
@@ -80,7 +84,7 @@ public class GameBetter implements IGame {
     }
 
     private void handlePenaltyBoxCases(int roll, Player currentPlayer) {
-        isGettingOutOfPenaltyBox = roll % 2 != 0;
+        isGettingOutOfPenaltyBox = canPlayerGetOutOfPenaltyBox(roll);
         if (!isGettingOutOfPenaltyBox) {
             System.out.println(currentPlayer + " is not getting out of the penalty box");
             return;
@@ -90,17 +94,8 @@ public class GameBetter implements IGame {
         movePlayerAndAskQuestion(currentPlayer, roll);
     }
 
-
-    private void tryToGetPlayerOutOfPenaltyBox(int roll, Player currentPlayer) {
-        isGettingOutOfPenaltyBox = roll % 2 != 0;
-        if (isGettingOutOfPenaltyBox) {
-            System.out.println(currentPlayer + " is getting out of the penalty box");
-
-            movePlayerAndAskQuestion(currentPlayer, roll);
-            return;
-        }
-
-        System.out.println(currentPlayer + " is not getting out of the penalty box");
+    private boolean canPlayerGetOutOfPenaltyBox(int roll) {
+        return roll % 2 != 0;
     }
 
     private void movePlayerAndAskQuestion(Player currentPlayer, int roll) {
@@ -152,7 +147,8 @@ public class GameBetter implements IGame {
     }
 
     public boolean wasCorrectlyAnswered() {
-        Player currentPlayer = players.get(currentPlayerIndex);
+        Player currentPlayer = getCurrentPlayer();
+        currentPlayer.incrementCorrectlyAnsweredQuestionsInARow();
         boolean notAWinner = true;
         if (currentPlayer.isInPenaltyBox() && !isGettingOutOfPenaltyBox) {
             switchToNextPlayer();
@@ -169,7 +165,11 @@ public class GameBetter implements IGame {
     private void awardPlayer(Player currentPlayer) {
         System.out.println("Answer was correct!!!!");
 
-        currentPlayer.incrementPurse();
+        if (playerIsOnAStreak(currentPlayer)) {
+            currentPlayer.addNumberOfCoins(NUMBER_OF_COINS_AWARDED_ON_STREAK);
+        } else {
+            currentPlayer.addNumberOfCoins(NUMBER_OF_COINS_AWARDED);
+        }
 
         System.out.println(currentPlayer + " now has " + currentPlayer.getGoldCoins() + " Gold Coins.");
     }
@@ -180,23 +180,42 @@ public class GameBetter implements IGame {
     }
 
     public boolean wrongAnswer() {
+        System.out.println("Question was incorrectly answered");
+
         boolean notAWinner = true;
-        Player currentPlayer = players.get(currentPlayerIndex);
+        Player currentPlayer = getCurrentPlayer();
+
+        if (playerIsOnAStreak(currentPlayer)) {
+            currentPlayer.resetCorrectlyAnsweredQuestionsInARow();
+        }
+
         if (currentPlayer.getIncorrectlyAnsweredQuestionsInARow() == 0) {
-            currentPlayer.incrementNumberOfQuestionsIncorrectlyAnsweredInARow();
+            currentPlayer.incrementIncorrectlyAnsweredQuestionsInARow();
             return notAWinner;
         }
 
-        System.out.println("Question was incorrectly answered");
-        System.out.println(currentPlayer + " was sent to the penalty box");
         currentPlayer.resetIncorrectlyAnsweredQuestionsInARow();
-        currentPlayer.setInPenaltyBox(true);
+        sendPlayerToPenaltyBox(currentPlayer);
 
         switchToNextPlayer();
         return notAWinner;
     }
 
-    private boolean didPlayerNotWin() {
-        return players.get(currentPlayerIndex).getGoldCoins() != 6; //posibil bug poate trebuia sa fie > 6
+    private boolean playerIsOnAStreak(Player currentPlayer) {
+        return currentPlayer.getCorrectlyAnsweredQuestionsInARow() >= REQUIRED_QUESTIONS_FOR_STREAK;
     }
+
+    private void sendPlayerToPenaltyBox(Player currentPlayer) {
+        System.out.println(currentPlayer + " was sent to the penalty box");
+        currentPlayer.setInPenaltyBox(true);
+    }
+
+    private boolean didPlayerNotWin() {
+        return players.get(currentPlayerIndex).getGoldCoins() != REQUIRED_COINS_FOR_WINNING;
+    }
+
+    public Player getCurrentPlayer() {
+        return players.get(currentPlayerIndex);
+    }
+
 }
